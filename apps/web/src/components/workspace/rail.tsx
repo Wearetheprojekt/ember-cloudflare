@@ -128,7 +128,7 @@ export function Rail({ me, workspaceName, current, activity, newRelease, openRep
     >
       <PageLink
         href="/"
-        aria-label="Ember home"
+        aria-label="ProjektChat home"
         title={workspaceName}
         aria-current={marked === "home" ? "page" : undefined}
         className="mb-1 flex size-14 shrink-0 items-center justify-center rounded-[10px]"

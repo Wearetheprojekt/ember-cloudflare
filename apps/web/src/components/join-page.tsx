@@ -19,7 +19,7 @@ import { loadPage } from "@/lib/page";
 
 /** What the page says when Turnstile's script doesn't load, so there's no check to pass. */
 export const TURNSTILE_UNAVAILABLE =
-  "Ember couldn't load Cloudflare's check that you're a person. Check your connection, and anything that blocks challenges.cloudflare.com, then reload the page.";
+  "ProjektChat couldn't load Cloudflare's check that you're a person. Check your connection, and anything that blocks challenges.cloudflare.com, then reload the page.";
 
 interface Props {
   workspace: SignedOutWorkspace;
@@ -74,7 +74,7 @@ export function JoinPage({ workspace, joinCode, emailLink, onGone, onJoined }: P
         setTurnstileToken(null);
         setTries((tries) => tries + 1);
       }
-      if (!(error instanceof ApiError)) return setProblem("Couldn't reach Ember. Check your connection and try again.");
+      if (!(error instanceof ApiError)) return setProblem("Couldn't reach ProjektChat. Check your connection and try again.");
       // An email address with an account goes to sign in with it filled in, and someone who signed in
       // elsewhere meanwhile goes home.
       if (error.redirect) return loadPage(error.redirect);

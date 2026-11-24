@@ -39,7 +39,7 @@ import { loadPage } from "@/lib/page";
 // and opens Ember from there.
 
 /** What the setup password step says where the setup link it was opened with is refused. */
-const STALE_LINK = "That setup link is out of date. Type this Ember's setup password instead.";
+const STALE_LINK = "That setup link is out of date. Type this ProjektChat's setup password instead.";
 /** The token in a setup link's fragment. */
 const setupTokenOf = (hash: string) => new URLSearchParams(hash.slice(1)).get("token") || null;
 /** The Worker's setup password, as its settings in the Cloudflare dashboard name it. */
@@ -138,7 +138,7 @@ function SetupPasswordStep({ linkToken, onAccepted }: { linkToken: string | null
       setBusy(false);
       // A link that couldn't be checked opens the form all the same, which has it checked again when it's sent.
       if (withLink && !(error instanceof ApiError && error.status < 500)) return onAccepted(secret);
-      if (!(error instanceof ApiError)) return setProblem("Couldn't reach Ember. Check your connection and try again.");
+      if (!(error instanceof ApiError)) return setProblem("Couldn't reach ProjektChat. Check your connection and try again.");
       // Someone else set it up first.
       if (error.status === 409) return loadPage("/");
       // Too many tries, say, which no other password would get past.
@@ -158,7 +158,7 @@ function SetupPasswordStep({ linkToken, onAccepted }: { linkToken: string | null
   }, [linkToken]);
 
   return (
-    <SetupCard problem={problem} subtitle="Ember is waiting for its administrator.">
+    <SetupCard problem={problem} subtitle="ProjektChat is waiting for its administrator.">
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -201,7 +201,7 @@ function SetupForm({ placeholders, setupSecret, onSetUp }: { placeholders: Setup
       onSetUp(await setUpWorkspace({ name, emailAddress, password: passwordInput.current?.value ?? "" }, await photo.photo(), setupSecret));
     } catch (error) {
       setBusy(false);
-      if (!(error instanceof ApiError)) return setProblem("Couldn't reach Ember. Check your connection and try again.");
+      if (!(error instanceof ApiError)) return setProblem("Couldn't reach ProjektChat. Check your connection and try again.");
       // The name, email address and photo stay, and the password starts over.
       if (error.field === "password") {
         if (passwordInput.current) passwordInput.current.value = "";
@@ -271,10 +271,10 @@ function SetupForm({ placeholders, setupSecret, onSetUp }: { placeholders: Setup
 /** The page without its form: what deploying Ember printed is the way in. */
 function SetupLinkNeeded() {
   return (
-    <SetupCard subtitle="Ember is waiting for its administrator.">
+    <SetupCard subtitle="ProjektChat is waiting for its administrator.">
       <Notice>
         <p>
-          Open the setup link that deploying Ember printed. It looks like <Code>{`${location.origin}/first_run#token=…`}</Code> and carries this deployment's
+          Open the setup link that deploying ProjektChat printed. It looks like <Code>{`${location.origin}/first_run#token=…`}</Code> and carries this deployment's
           setup token, so only whoever deployed it can set it up.
         </p>
         <p>
@@ -397,7 +397,7 @@ function SetupPasswordField({ ref, refusal }: { ref: Ref<HTMLInputElement>; refu
         </p>
       ) : (
         <p id="setup-password-description" className="text-sm leading-normal text-muted-foreground">
-          The one you gave Ember when you deployed it.
+          The one you gave ProjektChat when you deployed it.
         </p>
       )}
     </div>

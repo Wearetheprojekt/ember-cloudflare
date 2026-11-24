@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export function Version({ version, className }: { version: string; className?: string }) {
   return (
     <div className={cn("text-muted-foreground", className)}>
-      Ember version <span className="rounded-[0.3em] border border-muted-foreground px-[0.5ch] py-[0.1em]">{version}</span>
+      ProjektChat version <span className="rounded-[0.3em] border border-muted-foreground px-[0.5ch] py-[0.1em]">{version}</span>
     </div>
   );
 }

@@ -25,7 +25,7 @@ const FACTS: [string, string][] = [
 ];
 
 /** What an alert says about saving that failed: the server's reason, or that Ember couldn't be reached. */
-const reasonFor = (error: unknown) => (error instanceof ApiError ? error.message : "Couldn't reach Ember. Check your connection and try again.");
+const reasonFor = (error: unknown) => (error instanceof ApiError ? error.message : "Couldn't reach ProjektChat. Check your connection and try again.");
 
 /** Asks whether to turn huddles on, sets them up if so, and has `onOpen` open Ember either way. */
 export function SetupHuddles({ onOpen }: { onOpen: () => void }) {
@@ -143,7 +143,7 @@ function HuddlesOn({ onOpen }: { onOpen: () => void }) {
       </div>
       <footer className="border-t bg-surface p-5">
         <Button type="button" onClick={onOpen} className={cn(STEP_BUTTON, "w-full")}>
-          Open Ember <ArrowRight className="size-[1.125rem]" />
+          Open ProjektChat <ArrowRight className="size-[1.125rem]" />
         </Button>
       </footer>
     </SetupCard>

@@ -702,7 +702,7 @@ export interface Credentials {
 }
 
 /** What first run names the workspace. */
-export const ACCOUNT_NAME = "Ember";
+export const ACCOUNT_NAME = "ProjektChat";
 /**
  * The open rooms first run makes, everyone's to begin with, as a Slack workspace's are. The first,
  * general, is the workspace's first room, which first run opens and the welcome card shows in.

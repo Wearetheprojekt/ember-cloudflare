@@ -3828,7 +3828,7 @@ export class WorkspaceStore {
     if (!row) return null;
     const settings = storedSettings(row.settings);
     return {
-      name: row.name,
+      name: row.name === "Ember" ? "ProjektChat" : row.name,
       joinCode: row.join_code,
       tagline: taglineIn(settings),
       hideTranslationButtons: hidesTranslationButtons(settings),

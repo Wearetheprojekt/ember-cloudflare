@@ -27,7 +27,7 @@ import { takeReturnPath } from "@/lib/return-path";
 // link to join does, and nothing the page says tells who has an account.
 
 const SIGN_IN_PATH = "/session/new";
-const NO_CONNECTION = "Couldn't reach Ember. Check your connection and try again.";
+const NO_CONNECTION = "Couldn't reach ProjektChat. Check your connection and try again.";
 
 /**
  * The address the page asked Ember to email a code to, which it keeps in its history entry, so that it
@@ -111,7 +111,7 @@ function CodeRequest({ workspace, emailAddress, onChange, onAsked }: CodeRequest
       {problem && <Problem>{problem}</Problem>}
       <AuthCard>
         <AuthHeading title="Reset your password" logo={account.logo}>
-          Enter your email address, and Ember will email you a code to choose a new password with.
+          Enter your email address, and ProjektChat will email you a code to choose a new password with.
         </AuthHeading>
         <form
           className={AUTH_FORM}
@@ -188,7 +188,7 @@ function NewPassword({ workspace, emailAddress, onAskAgain }: NewPasswordProps) 
       {problem && <Problem>{problem}</Problem>}
       <AuthCard>
         <AuthHeading title="Check your email" logo={workspace.account.logo}>
-          If {emailAddress} has an account here, Ember emailed it a code that works for {PASSWORD_RESET_CODE_MINUTES} minutes. If it hasn't arrived soon, look in your
+          If {emailAddress} has an account here, ProjektChat emailed it a code that works for {PASSWORD_RESET_CODE_MINUTES} minutes. If it hasn't arrived soon, look in your
           spam folder.
         </AuthHeading>
         <form

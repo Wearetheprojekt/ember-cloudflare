@@ -56,7 +56,7 @@ function problemOnArrival(): { text: string; taken: boolean } | null {
 const REFUSALS = new Set([401, 403, 429]);
 
 /** What a sign-in that failed on Ember's side says, the password typed being as likely right as not. */
-const SIGN_IN_FAILED = "Ember couldn't sign you in just now. Please try again.";
+const SIGN_IN_FAILED = "ProjektChat couldn't sign you in just now. Please try again.";
 
 /** What the link to sign in with single sign-on asks, apart from Memberful's "Member?", which can be beside it. */
 const SSO_QUESTION = "Use single sign-on?";
@@ -121,7 +121,7 @@ export function SignInPage({ workspace, onSignedIn }: { workspace: SignedOutWork
       onSignedIn(answer);
     } catch (error) {
       setBusy(false);
-      if (!(error instanceof ApiError)) return setProblem("Couldn't reach Ember. Check your connection and try again.");
+      if (!(error instanceof ApiError)) return setProblem("Couldn't reach ProjektChat. Check your connection and try again.");
       if (!REFUSALS.has(error.status)) return setProblem(SIGN_IN_FAILED);
       if (passwordInput.current) passwordInput.current.value = "";
       // A member whose password is right, and who has connected Memberful or single sign-on, hears that they sign in with it.

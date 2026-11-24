@@ -26,6 +26,9 @@ const backend = (name: "do-sqlite" | "d1") => ({
           SESSION_SECRET: "test-secret",
           STORAGE_BACKEND: name,
           EMBER_GUEST_SIGN_IN: "true",
+          VAPID_SUBJECT: "",
+          EMBER_SETUP_NAME_PLACEHOLDER: "",
+          EMBER_SETUP_EMAIL_PLACEHOLDER: "",
           // No models file but the one Ember shipped with, unless a test serves one (assistant/offered.ts).
           EMBER_MODELS_URL: "",
           // The deploy's setup token, which test/support.ts's `api` sends to set Ember up.

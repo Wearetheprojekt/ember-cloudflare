@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   // Kept at the root, beside the workspace, so Deploy to Cloudflare finds it: the button renames the
   // Worker and the bucket here for each deployer.
-  "name": "ember",
+  "name": "ember-cloudflare",
   "main": "apps/worker/src/index.ts",
   "compatibility_date": "2026-10-01",
   // Link previews fetch pages people name: this sends those fetches out over the public Internet even

@@ -1,5 +1,6 @@
 import {
   isProviderFormat,
+  isXaiApiKey,
   PAGES_READ_PER_ANSWER,
   THINKING_LEVELS,
   thinkingTaken,
@@ -766,19 +767,25 @@ const isWrongFormat = (answered: Answered | GatewayRefusal | Asking): answered i
 
 /** What AI Gateway answers `request`, which asks `question` of the model `gateway` names, or why it refused, by `signal`. */
 async function send(env: Env, gateway: Gateway, question: Question, request: Record<string, unknown>, signal: AbortSignal): Promise<{ body: unknown } | GatewayRefusal> {
+  const directXai = isXaiApiKey(gateway.apiToken);
   const provider = isProviderFormat(gateway.format) ? gateway.format : null;
+  const payload = directXai && typeof request.model === "string" && request.model.startsWith("xai/") ? { ...request, model: request.model.slice("xai/".length) } : request;
   let response: Response;
   try {
-    response = await fetch(addressOf(env, gateway), {
+    response = await fetch(directXai ? `https://api.x.ai/v1/${gateway.format === "xai" ? "responses" : "chat/completions"}` : addressOf(env, gateway), {
       method: "POST",
       headers: {
         // A provider's endpoint would take a token in Authorization as the provider's own key, and pass it on.
-        ...(provider ? { "cf-aig-authorization": `Bearer ${gateway.apiToken}` } : { Authorization: `Bearer ${gateway.apiToken}`, "cf-aig-gateway-id": GATEWAY_ID }),
+        ...(directXai
+          ? { Authorization: `Bearer ${gateway.apiToken.trim()}` }
+          : provider
+            ? { "cf-aig-authorization": `Bearer ${gateway.apiToken}` }
+            : { Authorization: `Bearer ${gateway.apiToken}`, "cf-aig-gateway-id": GATEWAY_ID }),
         ...(provider === "anthropic" && { "anthropic-version": ANTHROPIC_VERSION }),
         "Content-Type": "application/json",
-        ...loggedAs(question),
+        ...(directXai ? {} : loggedAs(question)),
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify(payload),
       signal,
     });
   } catch (error) {

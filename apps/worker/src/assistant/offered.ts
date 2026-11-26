@@ -2,6 +2,8 @@ import { EMBER_REPOSITORY } from "@ember/protocol";
 import {
   ASSISTANT_MODELS,
   isWorkersAiModel,
+  isXaiApiKey,
+  isXaiModel,
   modelNameOf,
   modelOf,
   offeredModelOf,
@@ -173,6 +175,13 @@ const runsStill = ({ until }: OfferedModel) => until === undefined || until > ne
  */
 export async function offeredModelsOf(env: Env, keys: { accountId: string; apiToken: string | null }, fresh: boolean, noToken: string): Promise<OfferedModels> {
   const { accountId, apiToken } = keys;
+  if (isXaiApiKey(apiToken)) {
+    const [file, liveXai] = await Promise.all([modelsFileOf(env, true), xaiModelsOf(apiToken!)]);
+    const existingIds = new Set(liveXai.map(({ id }) => id));
+    const merged = [...liveXai, ...file.models.filter(({ id }) => isXaiModel(id) && !existingIds.has(id))];
+    const suggested = merged[0]?.id ?? "xai/grok-4.7";
+    return stillOffered(merged, suggested, null);
+  }
   const [file, workersAi] = await Promise.all([
     modelsFileOf(env, true),
     apiToken === null ? null : fresh ? readAndKeepWorkersAiModels(env, { accountId, apiToken }) : keptWorkersAiModelsOf(env, { accountId, apiToken }),
@@ -182,6 +191,35 @@ export async function offeredModelsOf(env: Env, keys: { accountId: string; apiTo
     return stillOffered(file.models, file.suggested, workersAi?.refusal ?? noToken);
   }
   return stillOffered([...file.models, ...workersAi], file.suggested, null);
+}
+
+/** Lists the live Grok text models directly from xAI (`https://api.x.ai/v1/models`) when given an `xai-...` API key. */
+async function xaiModelsOf(apiToken: string): Promise<OfferedModel[]> {
+  try {
+    const response = await fetch("https://api.x.ai/v1/models", {
+      headers: { Authorization: `Bearer ${apiToken.trim()}`, Accept: "application/json" },
+      signal: AbortSignal.timeout(READ_TIMEOUT_MS),
+    });
+    if (!response.ok) return [];
+    const body: unknown = await response.json().catch(() => null);
+    const data = isObject(body) && Array.isArray(body.data) ? body.data.filter(isObject) : [];
+    const models: OfferedModel[] = [];
+    for (const row of data) {
+      const rawId = typeof row.id === "string" ? row.id.trim() : "";
+      if (!rawId || /image|vision|embed/i.test(rawId)) continue;
+      const id = rawId.startsWith("xai/") ? rawId : `xai/${rawId}`;
+      if (modelOf(id) !== id) continue;
+      const pretty = rawId
+        .replace(/^xai\//, "")
+        .split("-")
+        .map((part) => (part.toLowerCase() === "grok" ? "Grok" : part.toUpperCase() === "MINI" ? "Mini" : part))
+        .join(" ");
+      models.push({ id, name: modelNameOf(pretty) ?? rawId, format: "chat", thinkingLevels: [] });
+    }
+    return models.sort((a, b) => b.id.localeCompare(a.id));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -201,6 +239,11 @@ export function stillOffered(listed: readonly OfferedModel[], suggested: string,
  * which is asked now when it hasn't been, but for one that has stopped running (`runsStill`).
  */
 export async function offeredModel(env: Env, model: string, keys: ModelSearchKeys): Promise<OfferedModel | null> {
+  if (isXaiApiKey(keys.apiToken) && isXaiModel(model)) {
+    const live = await xaiModelsOf(keys.apiToken);
+    const found = offeredModelOf(model, live) ?? offeredModelOf(model, (await modelsFileOf(env)).models);
+    return found ?? { id: model, name: model.slice("xai/".length), format: "chat", thinkingLevels: [] };
+  }
   const listed = isWorkersAiModel(model) ? await keptWorkersAiModelsOf(env, keys) : (await modelsFileOf(env)).models;
   const offered = "refusal" in listed ? undefined : offeredModelOf(model, listed);
   return offered && runsStill(offered) ? offered : null;

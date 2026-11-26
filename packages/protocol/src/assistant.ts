@@ -575,18 +575,25 @@ export function modelOf(text: string): string | null {
   return model.length <= MAX_MODEL_LENGTH && /^@?[\w.-]+(?:\/[\w.:@-]+)+$/.test(model) ? model : null;
 }
 
+/** Whether `token` is a direct xAI API key (`xai-...`), which talks straight to `api.x.ai` without a Cloudflare account ID. */
+export const isXaiApiKey = (token: string | null | undefined): boolean => typeof token === "string" && token.trim().startsWith("xai-");
+
+/** The placeholder account ID stored when an administrator sets up Ember AI with a direct `xai-...` API key alone. */
+export const DEFAULT_XAI_ACCOUNT_ID = "00000000000000000000000000000000";
+
 /**
  * The account Set up Ember AI asks through, as it sends it, or why it can't be one, on the field it's
  * about. A blank API token is left out, keeping the one Ember has.
  */
 export function parseAssistantKeys(data: unknown): AssistantKeys | { error: string; field: AssistantField } {
   const given = objectIn(data);
-  const accountId = typeof given.accountId === "string" ? accountIdOf(given.accountId) : null;
-  if (accountId === null) return { error: ACCOUNT_ID_REFUSED, field: "accountId" };
   const { apiToken: typed } = given;
   if (typed !== undefined && typeof typed !== "string") return { error: API_TOKEN_REFUSED, field: "apiToken" };
   const apiToken = typed === undefined || typed.trim() === "" ? undefined : apiTokenOf(typed);
   if (apiToken === null) return { error: API_TOKEN_REFUSED, field: "apiToken" };
+  const rawAccount = typeof given.accountId === "string" ? given.accountId : "";
+  const accountId = accountIdOf(rawAccount) ?? (rawAccount.trim() === "" && isXaiApiKey(apiToken) ? DEFAULT_XAI_ACCOUNT_ID : null);
+  if (accountId === null) return { error: ACCOUNT_ID_REFUSED, field: "accountId" };
   return apiToken === undefined ? { accountId } : { accountId, apiToken };
 }
 

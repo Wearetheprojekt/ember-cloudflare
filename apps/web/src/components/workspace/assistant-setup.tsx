@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import {
   ACCOUNT_ID_REFUSED,
   API_TOKEN_REFUSED,
+  DEFAULT_XAI_ACCOUNT_ID,
   accountIdOf,
   apiTokenOf,
+  isXaiApiKey,
   modelName,
   offeredModelOf,
   type AssistantField,
@@ -101,7 +103,8 @@ export function AssistantSetup({ assistant, deployedAccountId, onSaved, onClose,
   /** The account and API token as typed, a blank token keeping the one Ember has. */
   const keys = (): AssistantKeys => {
     const apiToken = apiTokenOf(typed.apiToken);
-    return { accountId: accountIdOf(typed.accountId) ?? "", ...(apiToken && { apiToken }) };
+    const accountId = accountIdOf(typed.accountId) ?? (isXaiApiKey(apiToken) ? DEFAULT_XAI_ACCOUNT_ID : "");
+    return { accountId, ...(apiToken && { apiToken }) };
   };
 
   // The models Ember offers through the account typed, listed once the model's step opens, with the API token typed, or Ember AI's.
@@ -273,9 +276,10 @@ function KeysStep({
   onCancel: () => void;
 }) {
   const tokenField = useSecretField(typed.apiToken);
+  const directXai = isXaiApiKey(typed.apiToken);
   const next = (event: FormEvent) => {
     event.preventDefault();
-    if (accountIdOf(typed.accountId) === null) return onRefuse("accountId", ACCOUNT_ID_REFUSED);
+    if (!directXai && accountIdOf(typed.accountId) === null) return onRefuse("accountId", ACCOUNT_ID_REFUSED);
     if (typed.apiToken.trim() !== "" && apiTokenOf(typed.apiToken) === null) return onRefuse("apiToken", API_TOKEN_REFUSED);
     onContinue();
   };
@@ -360,7 +364,7 @@ function KeysStep({
           )}
         </div>
       </div>
-      <Actions back={onCancel} backLabel="Cancel" next={null} disabled={typed.accountId.trim() === "" || (!hasToken && typed.apiToken.trim() === "")} />
+      <Actions back={onCancel} backLabel="Cancel" next={null} disabled={(!directXai && typed.accountId.trim() === "") || (!hasToken && typed.apiToken.trim() === "")} />
     </form>
   );
 }

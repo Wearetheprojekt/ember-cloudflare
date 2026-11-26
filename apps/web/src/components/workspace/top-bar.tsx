@@ -73,8 +73,8 @@ function SearchField({ me, workspaceName, rooms, field }: Pick<Props, "me" | "wo
 /** Ask @ember, with its avatar, as Slack's bar ends with Slackbot's, which opens your DM with it. */
 function AskEmberButton({ ember, onClick }: { ember: DirectoryUser; onClick: () => void }) {
   return (
-    <ShortcutTooltip label="Ask @ember">
-      <button type="button" aria-label="Ask @ember" onClick={onClick} className="grid size-[34px] shrink-0 place-items-center rounded-[10px] border bg-background hover:bg-hover touch:size-11">
+    <ShortcutTooltip label={`Ask @${ember.name}`}>
+      <button type="button" aria-label={`Ask @${ember.name}`} onClick={onClick} className="grid size-[34px] shrink-0 place-items-center rounded-[10px] border bg-background hover:bg-hover touch:size-11">
         <UserAvatar user={ember} className="size-6" />
       </button>
     </ShortcutTooltip>

@@ -42,7 +42,7 @@ export const versionOf = (updatedAt: string) => updatedAt.slice(0, 19).replace(/
 /** The address of the avatar `token` names, for someone who last changed at `updatedAt`. */
 function avatarPath(userId: UserId, token: string, updatedAt: string): string {
   const path = `/users/${encodeURIComponent(token)}/avatar?v=${versionOf(updatedAt)}`;
-  return userId === ASSISTANT_ID ? `${path}&release=${VERSION}` : path;
+  return userId === ASSISTANT_ID ? `${path}&release=${VERSION}-projektbot` : path;
 }
 
 /**

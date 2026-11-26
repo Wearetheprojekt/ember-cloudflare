@@ -1310,7 +1310,7 @@ const keptForOf = (access: AgentAccess): KeptFor | null => (access === "everyone
 
 const directoryEntry = (row: DirectoryRow): DirectoryEntry => ({
   id: row.id,
-  name: row.name,
+  name: row.id === ASSISTANT_ID ? ASSISTANT_NAME : row.name,
   username: row.username,
   bio: row.bio,
   role: ROLES[row.role] ?? "member",
@@ -1843,7 +1843,7 @@ function invitationPushes(roomId: RoomId, rows: InvitationPushRow[]): Invitation
 const isRanked = (rows: unknown[]) => (rows as Array<{ ranked: number }>)[0]?.ranked === 1;
 
 /** A DM's people, as the app has them, from the rows naming them. */
-const membersOf = (rows: DirectMemberRow[]): User[] => rows.map(({ id, name }) => ({ id, name }));
+const membersOf = (rows: DirectMemberRow[]): User[] => rows.map(({ id, name }) => ({ id, name: id === ASSISTANT_ID ? ASSISTANT_NAME : name }));
 
 /** Who a DM welcomes, and since when, when it started as they joined: nothing for any other. */
 const joinedOf = ({ newcomer_id, started_at }: StartRow): Pick<DirectRoom, "joined"> => (newcomer_id === null ? {} : { joined: { userId: newcomer_id, at: started_at } });
@@ -3253,7 +3253,7 @@ const GRANT_OPEN_ROOMS_TO_AGENTS = `INSERT INTO memberships (room_id, user_id, c
  * as it was, once it was turned off, so that its answers stay its own.
  */
 const ACTIVATE_ASSISTANT = `INSERT INTO users (id, name, role, created_at, updated_at) VALUES (?1, ?2, ${BOT}, ?3, ?3)
-  ON CONFLICT (id) DO UPDATE SET status = ${ACTIVE}, updated_at = excluded.updated_at WHERE status <> ${ACTIVE}`;
+  ON CONFLICT (id) DO UPDATE SET name = excluded.name, status = ${ACTIVE}, updated_at = excluded.updated_at WHERE status <> ${ACTIVE} OR name <> excluded.name`;
 
 /** Adds a bot, with its avatar. */
 const INSERT_BOT = `INSERT INTO users (id, name, role, bot_token, avatar_key, avatar_variant, created_at, updated_at) VALUES (?, ?, ${BOT}, ?, ?, ?, ?, ?)`;

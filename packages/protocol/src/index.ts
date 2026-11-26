@@ -2341,7 +2341,7 @@ export const NAME_TOO_LONG = `Name must be at most ${MAX_USER_NAME_LENGTH} chara
 /** The id of @ember, the account Ember AI answers as, which the Worker adds once an administrator sets Ember AI up. */
 export const ASSISTANT_ID: UserId = "ember";
 /** @ember's name, which nobody else can take (`isReservedName`). */
-export const ASSISTANT_NAME = "Ember";
+export const ASSISTANT_NAME = "ProjektBot";
 export const NAME_RESERVED = `${ASSISTANT_NAME} is the AI assistant's name. Choose another.`;
 
 /**
